@@ -7,29 +7,50 @@ const CartItem = ({ onContinueShopping }) => {
   const cart = useSelector(state => state.cart.items);
   const dispatch = useDispatch();
 
-  // Calculate total amount for all products in the cart
+  // Calculate total amount for all products in the cart，这里的cost是字符串$10，要转换为数字
   const calculateTotalAmount = () => {
- 
+    let totalAmount = 0;
+    cart.forEach((item)=>{
+      totalAmount += item.quantity * parseFloat(item.cost.replace("$", ""));
+    });
+    return totalAmount;
   };
 
   const handleContinueShopping = (e) => {
-   
+    onContinueShopping(e);
   };
 
-
-
+  // item.quantity是只读的，不能用++修改其自身
   const handleIncrement = (item) => {
+    const newQuantity = item.quantity+1;
+    const newItem = {...item, quantity: newQuantity};
+    dispatch(updateQuantity(newItem));
   };
 
+  // 若quantity<0，调用remove
   const handleDecrement = (item) => {
-   
+    const newQuantity = item.quantity-1;
+    if(newQuantity>=0){
+      const newItem = {...item, quantity: newQuantity};
+      dispatch(updateQuantity(newItem));
+    }else{
+      dispatch(removeItem(item.name));
+    }
   };
 
   const handleRemove = (item) => {
+    // console.log("targetItem: "+item);
+    dispatch(removeItem(item.name));
   };
 
   // Calculate total cost based on quantity for an item
   const calculateTotalCost = (item) => {
+    let totalAmount = item.quantity * parseFloat(item.cost.replace("$", ""));
+    return totalAmount;
+  };
+
+  const handleCheckoutShopping = (e) => {
+    alert('Functionality to be added for future reference');
   };
 
   return (
@@ -57,7 +78,7 @@ const CartItem = ({ onContinueShopping }) => {
       <div className="continue_shopping_btn">
         <button className="get-started-button" onClick={(e) => handleContinueShopping(e)}>Continue Shopping</button>
         <br />
-        <button className="get-started-button1">Checkout</button>
+        <button className="get-started-button1" onClick={(e) => handleCheckoutShopping(e)}>Checkout</button>
       </div>
     </div>
   );
